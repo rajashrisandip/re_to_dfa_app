@@ -205,6 +205,7 @@ st.markdown("### Using Syntax Tree + Firstpos,Lastpos,Followpos,nullable")
 st.markdown("### Based on Compiler Design Book")
 st.markdown("[📺1. Watch Full Video Tutorial on YouTube : Example1](https://www.youtube.com/watch?v=G8i_2CUHP_Y&t) ")
 st.markdown("[📺2. Watch Full Video Tutorial on YouTube : Example2](https://www.youtube.com/watch?v=PsWFuqd2O8c)")
+
 with st.expander("ℹ️ Help:How to Enter Regular Expressions"):
     st.markdown("""
     ### ✅ Regular Expression Input Guide
@@ -220,8 +221,10 @@ with st.expander("ℹ️ Help:How to Enter Regular Expressions"):
     2. (a|b)*abb → Zero or more a or b  then followed by abb         
     3. ba(a|b)*ab →  Starts with 'ba', then a or b repeated, ends with 'ab'
     """)
+
 regex_input = st.text_input("Enter Regular Expression:", value="b(a|b)*")
 
+# Initialize session state
 if "dfa_ready" not in st.session_state:
     st.session_state.dfa_ready = False
 
@@ -232,6 +235,7 @@ if st.button("Convert to DFA"):
         st.session_state.start = start
         st.session_state.finals = finals
         st.session_state.syntax_tree = syntax_tree
+        st.session_state.followpos = followpos  # ✅ FIX: store followpos
         st.session_state.dfa_ready = True
         st.success("✅ DFA Constructed!")
     except Exception as e:
@@ -239,7 +243,7 @@ if st.button("Convert to DFA"):
         st.error(f"Error: {str(e)}")
 
 if st.session_state.get("dfa_ready", False):
-    
+
     dfa = st.session_state.dfa
     start = st.session_state.start
     finals = st.session_state.finals
@@ -249,8 +253,7 @@ if st.session_state.get("dfa_ready", False):
     st.graphviz_chart(visualize_syntax_tree(syntax_tree).source)
 
     st.subheader("📘 Complete DFA Visualization")
-    st.graphviz_chart(visualize_dfa(st.session_state.dfa, st.session_state.start, st.session_state.finals).source)
-
+    st.graphviz_chart(visualize_dfa(dfa, start, finals).source)
 
     with st.expander("Step-by-Step Construction Details"):
         st.subheader("1️⃣ Nullable Values")
@@ -262,13 +265,12 @@ if st.session_state.get("dfa_ready", False):
         st.subheader("3️⃣ Lastpos")
         st.write(f"`{syntax_tree.lastpos}`")
 
-        # Convert dictionary to DataFrame for display
         st.subheader("4️⃣ Followpos")
 
-        # Sample followpos dict for demonstration
-        # followpos = {"1": [2], "2": [3,4,5], "3": [3,4,5], "4": [3,4,5], "5": [6], "6": [7], "7": []}
+        # ✅ Use the preserved followpos from session state
+        followpos = st.session_state.get("followpos", {})
 
-        if followpos:
+        if followpos and isinstance(followpos, dict):
             try:
                 followpos_table = []
                 for key, value in followpos.items():
@@ -278,8 +280,6 @@ if st.session_state.get("dfa_ready", False):
 
                 df = pd.DataFrame(followpos_table)
                 df = df.sort_values(by="Node")
-
-                # ✅ Display without index column
                 st.dataframe(df.set_index("Node"))
 
             except Exception as e:
@@ -287,8 +287,20 @@ if st.session_state.get("dfa_ready", False):
         else:
             st.warning("⚠️ No followpos data available.")
 
+# 🎯 Test Input String on DFA
+if st.session_state.get("dfa_ready", False):
+    dfa = st.session_state.dfa
+    start = st.session_state.start
+    finals = st.session_state.finals
+
     st.subheader("🎯 Test String on DFA")
     test_str = st.text_input("Enter string to test:")
     if test_str:
-        result = simulate_dfa(dfa, start, finals, test_str)
-        st.success("✅ Accepted" if result else "❌ Rejected")
+        try:
+            result = simulate_dfa(dfa, start, finals, test_str)
+            if result:
+                st.success("✅ Accepted")
+            else:
+                st.error("❌ Rejected")
+        except Exception as e:
+            st.error(f"❌ Error testing string: {e}")
