@@ -150,7 +150,7 @@ def visualize_dfa(dfa, start_state, final_states):
     dot = graphviz.Digraph(format='png')
     
     # Set graph and node size attributes to scale down
-    dot.attr(size="5,3")                # Shrinks overall graph size (width,height in inches)
+    dot.attr(size="6,4")                # Shrinks overall graph size (width,height in inches)
     dot.attr('node', fontsize='10')    # Smaller node font
     dot.attr('edge', fontsize='10')    # Smaller edge font
     dot.attr('graph', rankdir='LR')    # Optional: left-to-right layout
