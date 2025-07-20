@@ -1,6 +1,8 @@
 
 import streamlit as st
 import graphviz
+import pandas as pd
+
 
 # ========== Core DFA Logic ==========
 
@@ -260,13 +262,30 @@ if st.session_state.get("dfa_ready", False):
         st.subheader("3️⃣ Lastpos")
         st.write(f"`{syntax_tree.lastpos}`")
 
+        # Convert dictionary to DataFrame for display
         st.subheader("4️⃣ Followpos")
-        st.json(followpos)
 
-        st.subheader("5️⃣ Final DFA Table")
-        st.write("Start State:", start)
-        st.write("Final States:", finals)
-        st.json(dfa)
+        # Sample followpos dict for demonstration
+        # followpos = {"1": [2], "2": [3,4,5], "3": [3,4,5], "4": [3,4,5], "5": [6], "6": [7], "7": []}
+
+        if followpos:
+            try:
+                followpos_table = []
+                for key, value in followpos.items():
+                    node = int(key)
+                    fp = ', '.join(str(v) for v in value)
+                    followpos_table.append({"Node": node, "followpos": fp})
+
+                df = pd.DataFrame(followpos_table)
+                df = df.sort_values(by="Node")
+
+                # ✅ Display without index column
+                st.dataframe(df.set_index("Node"))
+
+            except Exception as e:
+                st.error(f"❌ Error processing Followpos: {e}")
+        else:
+            st.warning("⚠️ No followpos data available.")
 
     st.subheader("🎯 Test String on DFA")
     test_str = st.text_input("Enter string to test:")
