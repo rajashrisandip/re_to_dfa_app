@@ -203,7 +203,22 @@ st.markdown("### Using Syntax Tree + Firstpos,Lastpos,Followpos,nullable")
 st.markdown("### Based on Compiler Design Book")
 st.markdown("[📺1. Watch Full Video Tutorial on YouTube : Example1](https://www.youtube.com/watch?v=G8i_2CUHP_Y&t) ")
 st.markdown("[📺2. Watch Full Video Tutorial on YouTube : Example2](https://www.youtube.com/watch?v=PsWFuqd2O8c)")
-regex_input = st.text_input("Enter Regular Expression:", value="a(b|c)*")
+with st.expander("ℹ️ Help:How to Enter Regular Expressions"):
+    st.markdown("""
+    ### ✅ Regular Expression Input Guide
+    - Use `|` for **OR** operations  
+      → Example: `(a|b)` means 'a or b'
+    - Use `*` for repetition  
+      → Example: `(a|b)*` means zero or more repetitions of a or b
+    - Do **not** use `+` for OR  
+      → ❌ Incorrect: `a+b` (This means "one or more a's followed by b", not a OR b)
+
+    ### 🔍 Sample Regular Expressions
+    1. **(a|b)*** → Zero or more a or b  
+                
+    2. ba(a|b)*ab →  Starts with 'ba', then a or b repeated, ends with 'ab'
+    """)
+regex_input = st.text_input("Enter Regular Expression:", value="b(a|b)*")
 
 if "dfa_ready" not in st.session_state:
     st.session_state.dfa_ready = False
