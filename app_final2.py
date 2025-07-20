@@ -216,9 +216,9 @@ with st.expander("ℹ️ Help:How to Enter Regular Expressions"):
       → ❌ Incorrect: `a+b` (This means "one or more a's followed by b", not a OR b)
 
     ### 🔍 Sample Regular Expressions
-    1. **(a|b)*** → Zero or more a or b  
-                
-    2. ba(a|b)*ab →  Starts with 'ba', then a or b repeated, ends with 'ab'
+    1. (a|b)* → Zero or more a or b  
+    2. (a|b)*abb → Zero or more a or b  then followed by abb         
+    3. ba(a|b)*ab →  Starts with 'ba', then a or b repeated, ends with 'ab'
     """)
 regex_input = st.text_input("Enter Regular Expression:", value="b(a|b)*")
 
